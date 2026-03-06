@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="三餐随机选择助手 - 帮你决定每天吃什么">
+  <title>三餐助手</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 状态栏模拟 -->
+  <div class="status-bar">
+    <div class="status-left" id="currentDate">2026年02月28日</div>
+    <div class="status-right">
+      <span> </span>
+      <span> </span>
+      <span> </span>
+    </div>
+  </div>
+
+  <!-- 功能按钮区 -->
+  <div class="func-btn-wrap">
+    <button class="onekey-btn" id="oneKeyChooseAll">一键选择三餐</button>
+    <button class="clear-all-meal-btn" id="clearAllMeal">一键清空三餐</button>
+  </div>
+
+  <!-- 三餐随机抽选区 -->
+  <div class="meal-random-section">
+    <!-- 早餐随机 -->
+    <div class="meal-item">
+      <div class="meal-header">
+        <span class="meal-title">早餐</span>
+        <span class="meal-tag">BREAKFAST</span>
+      </div>
+      <div class="food-random-box">
+        <span class="random-food" id="breakfastFood">全麦三明治</span>
+      </div>
+      <div class="meal-btn-group">
+        <button class="random-btn" id="toggleBreakfastRoll">开始随机</button>
+        <button class="clear-meal-btn" id="clearBreakfast">清空</button>
+      </div>
+    </div>
+
+    <!-- 午餐随机 -->
+    <div class="meal-item">
+      <div class="meal-header">
+        <span class="meal-title">午餐</span>
+        <span class="meal-tag">LUNCH</span>
+      </div>
+      <div class="food-random-box">
+        <span class="random-food" id="lunchFood">鸡胸肉沙拉</span>
+      </div>
+      <div class="meal-btn-group">
+        <button class="random-btn" id="toggleLunchRoll">开始随机</button>
+        <button class="clear-meal-btn" id="clearLunch">清空</button>
+      </div>
+    </div>
+
+    <!-- 晚餐随机 -->
+    <div class="meal-item">
+      <div class="meal-header">
+        <span class="meal-title">晚餐</span>
+        <span class="meal-tag">DINNER</span>
+      </div>
+      <div class="food-random-box">
+        <span class="random-food" id="dinnerFood">番茄肥牛火锅</span>
+      </div>
+      <div class="meal-btn-group">
+        <button class="random-btn" id="toggleDinnerRoll">开始随机</button>
+        <button class="clear-meal-btn" id="clearDinner">清空</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 标签栏粘性定位容器 -->
+  <div class="tag-sticky-container">
+    <!-- 筛选标签栏 -->
+    <div class="tag-scroll">
+      <div class="tag-scroll-wrap">
+        <!-- 「全部」标签 -->
+        <div class="tag-item active" id="selectAllTags">
+          <span class="tag-text">全部</span>
+        </div>
+        <!-- 其他标签 -->
+        <div class="tag-item" data-tag="轻食">
+          <span class="tag-text">轻食</span>
+        </div>
+        <div class="tag-item" data-tag="火锅">
+          <span class="tag-text">火锅</span>
+        </div>
+        <div class="tag-item" data-tag="快餐">
+          <span class="tag-text">快餐</span>
+        </div>
+        <div class="tag-item" data-tag="家常菜">
+          <span class="tag-text">家常菜</span>
+        </div>
+        <div class="tag-item" data-tag="甜品">
+          <span class="tag-text">甜品</span>
+        </div>
+        <div class="tag-item" data-tag="面食">
+          <span class="tag-text">面食</span>
+        </div>
+        <div class="tag-item" data-tag="米饭">
+          <span class="tag-text">米饭</span>
+        </div>
+        <div class="tag-item" data-tag="小吃">
+          <span class="tag-text">小吃</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 食物列表滚动容器 -->
+  <div class="food-list-scroll">
+    <div class="food-list" id="foodList">
+      <!-- 食物卡片将通过JS动态生成 -->
+    </div>
+  </div>
+
+  <!-- 悬浮添加按钮 -->
+  <div class="float-add-btn" id="showAddModal">
+    <span>+</span>
+  </div>
+
+  <!-- 添加/修改食物弹窗 -->
+  <div class="modal-mask" id="modalMask" style="display: none;"></div>
+  <div class="modal-content" id="modalContent" style="display: none;">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">添加新食物</span>
+      <span class="modal-close" id="hideModal">✕</span>
+    </div>
+    
+    <!-- 选择三餐分类 -->
+    <div class="modal-section">
+      <span class="section-title">三餐分类</span>
+      <div class="meal-type-wrap">
+        <div class="meal-type-item" data-type="早餐">早餐</div>
+        <div class="meal-type-item" data-type="午餐">午餐</div>
+        <div class="meal-type-item" data-type="晚餐">晚餐</div>
+      </div>
+    </div>
+    
+    <!-- 手动输入模块 -->
+    <div class="modal-section">
+      <span class="section-title">食物名称</span>
+      <input class="food-input" id="inputFoodName" placeholder="请输入食物名称"></input>
+    </div>
+    
+    <!-- 标签勾选模块 -->
+    <div class="modal-section">
+      <span class="section-title">标签选择</span>
+      <!-- 手动添加标签输入框 -->
+      <div class="add-tag-wrap">
+        <input 
+          class="add-tag-input" 
+          id="customTagInput"
+          placeholder="输入自定义标签并回车添加"
+        ></input>
+        <button class="add-tag-btn" id="addCustomTagBtn" style="display: none;">添加</button>
+      </div>
+      <!-- 标签选择列表 -->
+      <div class="tag-check-wrap" id="tagCheckWrap">
+        <!-- 标签将通过JS动态生成 -->
+      </div>
+    </div>
+    
+    <!-- 智能推荐模块 -->
+    <div class="modal-section">
+      <span class="section-title">智能推荐</span>
+      <div class="recommend-list" id="recommendList">
+        <!-- 推荐项将通过JS动态生成 -->
+      </div>
+    </div>
+    
+    <button class="modal-submit" id="modalSubmit">确认添加</button>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div class="modal-mask" id="deleteModalMask" style="display: none;"></div>
+  <div class="delete-modal" id="deleteModal" style="display: none;">
+    <div class="delete-content">
+      <span class="delete-title">确认删除？</span>
+      <span class="delete-desc">删除后将从列表和随机库中移除该食物</span>
+      <div class="delete-btns">
+        <button class="cancel-btn" id="hideDeleteConfirm">取消</button>
+        <button class="confirm-delete-btn" id="confirmDelete">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 标签删除确认弹窗 -->
+  <div class="modal-mask" id="tagDeleteModalMask" style="display: none;"></div>
+  <div class="delete-modal" id="tagDeleteModal" style="display: none;">
+    <div class="delete-content">
+      <span class="delete-title">确认删除标签？</span>
+      <span class="delete-desc">删除后所有食物的该标签也会被移除</span>
+      <div class="delete-btns">
+        <button class="cancel-btn" id="hideTagDeleteConfirm">取消</button>
+        <button class="confirm-delete-btn" id="confirmDeleteTag">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
