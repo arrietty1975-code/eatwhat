@@ -124,12 +124,17 @@ body {
   font-size: 18px;
   font-weight: 600;
   color: #2d5a8c;
-  transition: all 0.1s;
   display: block;
+  transition: none;
 }
 
 .random-food.rolling {
   animation: roll 0.1s infinite;
+}
+
+.random-food:not(.rolling) {
+  animation: none;
+  transform: translateY(0);
 }
 
 @keyframes roll {
