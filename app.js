@@ -249,11 +249,13 @@ class MealApp {
   // ========== 三餐随机控制 ==========
   toggleBreakfastRoll() {
     if (this.breakfastRolling) return;
-    if (this.breakfastFood === this.defaultEmptyText) {
-      const randomIndex = Math.floor(Math.random() * this.breakfastFoodList.length);
-      this.breakfastFood = this.breakfastFoodList[randomIndex];
-      this.updateBreakfastDisplay();
+    
+    // 清除之前的定时器（如果有）
+    if (this.breakfastInterval) {
+      clearInterval(this.breakfastInterval);
+      this.breakfastInterval = null;
     }
+    
     this.breakfastRolling = true;
     this.updateBreakfastButton();
     
@@ -266,18 +268,25 @@ class MealApp {
     
     setTimeout(() => {
       clearInterval(interval);
+      this.breakfastInterval = null;
+      // 最终确定一个随机食物
+      const finalIndex = Math.floor(Math.random() * this.breakfastFoodList.length);
+      this.breakfastFood = this.breakfastFoodList[finalIndex];
       this.breakfastRolling = false;
+      this.updateBreakfastDisplay();
       this.updateBreakfastButton();
     }, this.rollDuration);
   }
 
   toggleLunchRoll() {
     if (this.lunchRolling) return;
-    if (this.lunchFood === this.defaultEmptyText) {
-      const randomIndex = Math.floor(Math.random() * this.lunchFoodList.length);
-      this.lunchFood = this.lunchFoodList[randomIndex];
-      this.updateLunchDisplay();
+    
+    // 清除之前的定时器（如果有）
+    if (this.lunchInterval) {
+      clearInterval(this.lunchInterval);
+      this.lunchInterval = null;
     }
+    
     this.lunchRolling = true;
     this.updateLunchButton();
     
@@ -290,18 +299,25 @@ class MealApp {
     
     setTimeout(() => {
       clearInterval(interval);
+      this.lunchInterval = null;
+      // 最终确定一个随机食物
+      const finalIndex = Math.floor(Math.random() * this.lunchFoodList.length);
+      this.lunchFood = this.lunchFoodList[finalIndex];
       this.lunchRolling = false;
+      this.updateLunchDisplay();
       this.updateLunchButton();
     }, this.rollDuration);
   }
 
   toggleDinnerRoll() {
     if (this.dinnerRolling) return;
-    if (this.dinnerFood === this.defaultEmptyText) {
-      const randomIndex = Math.floor(Math.random() * this.dinnerFoodList.length);
-      this.dinnerFood = this.dinnerFoodList[randomIndex];
-      this.updateDinnerDisplay();
+    
+    // 清除之前的定时器（如果有）
+    if (this.dinnerInterval) {
+      clearInterval(this.dinnerInterval);
+      this.dinnerInterval = null;
     }
+    
     this.dinnerRolling = true;
     this.updateDinnerButton();
     
@@ -314,7 +330,12 @@ class MealApp {
     
     setTimeout(() => {
       clearInterval(interval);
+      this.dinnerInterval = null;
+      // 最终确定一个随机食物
+      const finalIndex = Math.floor(Math.random() * this.dinnerFoodList.length);
+      this.dinnerFood = this.dinnerFoodList[finalIndex];
       this.dinnerRolling = false;
+      this.updateDinnerDisplay();
       this.updateDinnerButton();
     }, this.rollDuration);
   }
@@ -886,10 +907,42 @@ class MealApp {
       this.checkedTags = this.checkedTags.filter(t => t !== tag);
     }
   }
+
+  // 清理所有定时器
+  clearAllIntervals() {
+    if (this.breakfastInterval) {
+      clearInterval(this.breakfastInterval);
+      this.breakfastInterval = null;
+      this.breakfastRolling = false;
+      this.updateBreakfastDisplay();
+      this.updateBreakfastButton();
+    }
+    if (this.lunchInterval) {
+      clearInterval(this.lunchInterval);
+      this.lunchInterval = null;
+      this.lunchRolling = false;
+      this.updateLunchDisplay();
+      this.updateLunchButton();
+    }
+    if (this.dinnerInterval) {
+      clearInterval(this.dinnerInterval);
+      this.dinnerInterval = null;
+      this.dinnerRolling = false;
+      this.updateDinnerDisplay();
+      this.updateDinnerButton();
+    }
+  }
 }
 
 // 初始化应用
 let app;
 document.addEventListener('DOMContentLoaded', () => {
   app = new MealApp();
+  
+  // 页面卸载时清理定时器
+  window.addEventListener('beforeunload', () => {
+    if (app) {
+      app.clearAllIntervals();
+    }
+  });
 });
