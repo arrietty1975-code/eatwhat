@@ -1,0 +1,15 @@
+{
+    "pages": [
+      "pages/index/index"
+    ],
+    "window": {
+      "backgroundTextStyle": "dark",
+      "navigationBarBackgroundColor": "#4a90e2",
+      "navigationBarTitleText": "三餐助手 (MealChoice)",
+      "navigationBarTextStyle": "white",
+      "backgroundColor": "#f5f9fc",
+      "navigationBarBorderBottom": "1rpx solid #d1e7f0"
+    },
+    "sitemapLocation": "sitemap.json",
+    "style": "v2"
+  }

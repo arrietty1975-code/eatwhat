@@ -1,0 +1,163 @@
+<!-- 状态栏模拟 -->
+<view class="status-bar">
+  <view class="status-left">2026年02月28日</view>
+  <view class="status-right">
+    <text>🔋</text>
+    <text>📶</text>
+    <text>⏰</text>
+  </view>
+</view>
+
+<!-- 功能按钮区 -->
+<view class="func-btn-wrap">
+  <button class="onekey-btn" bindtap="oneKeyChooseAll">一键选择三餐</button>
+  <button class="clear-btn" bindtap="clearAllTags">清空筛选</button>
+</view>
+
+<!-- 三餐随机抽选区（淡蓝色+圆润） -->
+<view class="meal-random-section">
+  <!-- 早餐随机 -->
+  <view class="meal-item">
+    <view class="meal-header">
+      <text class="meal-title">早餐</text>
+      <text class="meal-tag">BREAKFAST</text>
+    </view>
+    <view class="food-random-box">
+      <text class="random-food {{breakfastRolling ? 'rolling' : ''}}">{{breakfastFood}}</text>
+    </view>
+    <button class="random-btn" bindtap="toggleBreakfastRoll" disabled="{{breakfastRolling}}">
+      {{breakfastRolling ? '随机中...' : '开始随机'}}
+    </button>
+  </view>
+
+  <!-- 午餐随机 -->
+  <view class="meal-item">
+    <view class="meal-header">
+      <text class="meal-title">午餐</text>
+      <text class="meal-tag">LUNCH</text>
+    </view>
+    <view class="food-random-box">
+      <text class="random-food {{lunchRolling ? 'rolling' : ''}}">{{lunchFood}}</text>
+    </view>
+    <button class="random-btn" bindtap="toggleLunchRoll" disabled="{{lunchRolling}}">
+      {{lunchRolling ? '随机中...' : '开始随机'}}
+    </button>
+  </view>
+
+  <!-- 晚餐随机 -->
+  <view class="meal-item">
+    <view class="meal-header">
+      <text class="meal-title">晚餐</text>
+      <text class="meal-tag">DINNER</text>
+    </view>
+    <view class="food-random-box">
+      <text class="random-food {{dinnerRolling ? 'rolling' : ''}}">{{dinnerFood}}</text>
+    </view>
+    <button class="random-btn" bindtap="toggleDinnerRoll" disabled="{{dinnerRolling}}">
+      {{dinnerRolling ? '随机中...' : '开始随机'}}
+    </button>
+  </view>
+</view>
+
+<!-- 标签筛选滑动条 -->
+<view class="tag-scroll">
+  <scroll-view scroll-x class="tag-scroll-wrap">
+    <view class="tag-item {{selectedTags.includes(item) ? 'active' : ''}}" 
+          wx:for="{{tags}}" 
+          wx:key="index"
+          bindtap="toggleTag"
+          data-tag="{{item}}">
+      {{item}}
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 食物列表（新增编辑/删除按钮） -->
+<view class="food-list">
+  <view class="food-card" wx:for="{{filteredFoods}}" wx:key="id">
+    <view class="food-info">
+      <view class="food-header">
+        <view class="food-name">{{item.name}}</view>
+        <view class="food-meal-tag">{{item.mealType}}</view>
+      </view>
+      <view class="food-date">上次食用：{{item.lastEatDate}}</view>
+      <view class="food-tags">
+        <text class="tag-chip" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+      </view>
+      <!-- 新增操作按钮 -->
+      <view class="food-actions">
+        <button class="edit-btn" bindtap="showEditModal" data-food="{{item}}">编辑</button>
+        <button class="delete-btn" bindtap="showDeleteConfirm" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 悬浮添加按钮 -->
+<view class="float-add-btn" bindtap="showAddModal">
+  <text>+</text>
+</view>
+
+<!-- 添加/修改食物弹窗 -->
+<view class="modal-mask" wx:if="{{showModal}}" bindtap="hideModal"></view>
+<view class="modal-content" wx:if="{{showModal}}">
+  <view class="modal-header">
+    <text class="modal-title">{{isEditMode ? '修改食物' : '添加新食物'}}</text>
+    <text class="modal-close" bindtap="hideModal">✕</text>
+  </view>
+  
+  <!-- 选择三餐分类 -->
+  <view class="modal-section">
+    <text class="section-title">三餐分类</text>
+    <view class="meal-type-wrap">
+      <label class="meal-type-item" wx:for="{{mealTypes}}" wx:key="index">
+        <radio value="{{item}}" checked="{{selectedMealType === item}}" bindchange="chooseMealType"/>
+        <text>{{item}}</text>
+      </label>
+    </view>
+  </view>
+  
+  <!-- 手动输入模块 -->
+  <view class="modal-section">
+    <text class="section-title">食物名称</text>
+    <input class="food-input" placeholder="请输入食物名称" bindinput="inputFoodName" value="{{inputFoodName}}"></input>
+  </view>
+  
+  <!-- 标签勾选模块 -->
+  <view class="modal-section">
+    <text class="section-title">标签选择</text>
+    <view class="tag-check-wrap">
+      <label class="tag-check-item" wx:for="{{tags}}" wx:key="index">
+        <checkbox value="{{item}}" bindchange="checkTag" checked="{{checkedTags.includes(item)}}"/>
+        <text>{{item}}</text>
+      </label>
+    </view>
+  </view>
+  
+  <!-- 智能推荐模块 -->
+  <view class="modal-section">
+    <text class="section-title">智能推荐</text>
+    <view class="recommend-list">
+      <view class="recommend-item" wx:for="{{recommendFoods}}" wx:key="index" bindtap="chooseRecommend" data-name="{{item}}">
+        {{item}}
+      </view>
+    </view>
+  </view>
+  
+  <button class="modal-submit" bindtap="{{isEditMode ? 'updateFood' : 'addFood'}}">
+    {{isEditMode ? '确认修改' : '确认添加'}}
+  </button>
+</view>
+
+<!-- 删除确认弹窗 -->
+<view class="modal-mask" wx:if="{{showDeleteModal}}" bindtap="hideDeleteConfirm"></view>
+<view class="delete-modal" wx:if="{{showDeleteModal}}">
+  <view class="delete-content">
+    <text class="delete-title">确认删除？</text>
+    <text class="delete-desc">删除后将从列表和随机库中移除该食物</text>
+    <view class="delete-btns">
+      <button class="cancel-btn" bindtap="hideDeleteConfirm">取消</button>
+      <button class="confirm-delete-btn" bindtap="confirmDelete">确认删除</button>
+    </view>
+  </view>
+</view>
